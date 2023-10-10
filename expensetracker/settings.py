@@ -79,8 +79,12 @@ WSGI_APPLICATION = 'expensetracker.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'major',
+        'USER': 'root',
+        'PASSWORD': 'student12345',
+        'HOST': 'localhost',
+        'PORT': '3306',
     }
 }
 
@@ -130,3 +134,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MESSAGE_TAGS = {
     messages.ERROR: 'danger'
 }
+
+# Email Settings
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'hemantshirsath24@gmail.com'
+EMAIL_HOST_PASSWORD = 'gjxu zgem wvtv vklu'
+DEFAULT_FROM_EMAIL = 'hemantshirsath24@gmail.com'
