@@ -21,12 +21,12 @@
         <ul class="navbar-nav px-3" style="display: flex; flex-direction: row; align-items: center;">
             <li class="nav-item text-nowrap">
                 <span class="nav-link" href="">
-                    <!-- ({{request.user.username}}) -->
+                    {{request.user.username|capfirst}}
                 </span>
             </li>
 
             <li class="nav-item text-nowrap mt-3 ml-2">
-                <form action="" method="POST">
+                <form action="{%url 'logout'%}" method="POST">
                     {% csrf_token %}
                     <input class="text text-capitalize" type="submit" value="Sign out" />
                 </form>

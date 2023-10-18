@@ -12,6 +12,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from .utils import account_activation_token
 from django.db import transaction
+from django.contrib import auth
 # Create your views here.
 
 
@@ -88,6 +89,25 @@ class LoginView(View):
     def get(self, request):
         return render(request, 'authentication/login.html')
 
+    def post(self, request):
+        username = request.POST['username']
+        password = request.POST['password']
+        if username and password:
+            user = auth.authenticate(username=username, password=password)
+            if user:
+                if user.is_active:
+                    auth.login(request, user)
+                    messages.success(request, "Welcome, " +
+                                     user.username + " you are now logged in")
+                    return redirect('expenses')
+                messages.error(
+                    request, 'Account is not active, Please check your email')
+                return render(request, 'authentication/login.html')
+            messages.error(request, "Invalid credentials, try again")
+            return render(request, "authentication/login.html")
+        messages.error(request, "Please fill all fields")
+        return render(request, "authentication/login.html")
+
 
 class VerificationView(View):
     def get(self, request, uidb64, token):
@@ -107,4 +127,11 @@ class VerificationView(View):
             return redirect('login')
         except Exception as e:
             pass
+        return redirect('login')
+
+
+class LogoutView(View):
+    def post(self, request):
+        auth.logout(request)
+        messages.success(request, "You have been logged out")
         return redirect('login')

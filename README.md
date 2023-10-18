@@ -20,36 +20,53 @@ To run this application locally, follow these steps:
 
 1. Clone the repository to your local machine:
 
+   ```bash
    git clone https://github.com/yourusername/personal-expense-tracker.git
+   ```
 
 2. Create a virtual environment (optional but recommended):
+
+   ```bash
    python -m venv venv
+   ```
 
 3. Activate the virtual environment:
 
    - **Windows**:
 
+     ```bash
      venv\Scripts\activate
+     ```
 
    - **macOS and Linux**:
 
+     ```bash
      source venv/bin/activate
+     ```
 
 4. Install the required dependencies:
 
+   ```bash
    pip install -r requirements.txt
+   ```
 
 5. Apply database migrations:
 
+   ```bash
    python manage.py migrate
+   ```
 
 6. Create a superuser account to access the admin panel:
 
+   ```bash
    python manage.py createsuperuser
+   ```
 
 7. Start the development server:
 
+   ```bash
    python manage.py runserver
+   ```
 
 8. Open your web browser and go to `http://localhost:8000` to access the application.
 
@@ -73,21 +90,23 @@ If you'd like to contribute to this project, please follow these steps:
 
 2. Create a new branch for your feature or bug fix:
 
+   ```bash
    git checkout -b feature-name
+   ```
 
 3. Make your changes and commit them:
 
+   ```bash
    git commit -m "Add new feature"
+   ```
 
 4. Push your changes to your forked repository:
 
+   ```bash
    git push origin feature-name
+   ```
 
 5. Create a pull request on the original repository to propose your changes.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
 
