@@ -110,6 +110,7 @@ def expense_edit(request, id):
         return render(request, 'expenses/edit-expense.html', context)
     if request.method == 'POST':
         amount = request.POST['amount']
+        date_str = request.POST.get('expense_date')
 
         if not amount:
             messages.error(request, 'Amount is required')
@@ -122,16 +123,40 @@ def expense_edit(request, id):
             messages.error(request, 'description is required')
             return render(request, 'expenses/edit-expense.html', context)
 
-        expense.owner = request.user
-        expense.amount = amount
-        expense. date = date
-        expense.category = category
-        expense.description = description
+        try:
+            # Convert the date string to a datetime object and validate the date
+            date = datetime.datetime.strptime(date_str, '%Y-%m-%d').date()
+            today = datetime.date.today()
 
-        expense.save()
-        messages.success(request, 'Expense updated  successfully')
+            if date > today:
+                messages.error(request, 'Date cannot be in the future')
+                return render(request, 'expenses/add_expense.html', context)
 
-        return redirect('expenses')
+            expense.owner = request.user
+            expense.amount = amount
+            expense. date = date
+            expense.category = category
+            expense.description = description
+
+            expense.save()
+            messages.success(request, 'Expense saved successfully')
+
+            return redirect('expenses')
+        except ValueError:
+            messages.error(request, 'Invalid date format')
+            return render(request, 'expenses/edit_income.html', context)
+
+        # expense.owner = request.user
+        # expense.amount = amount
+        # expense. date = date
+        # expense.category = category
+        # expense.description = description
+
+        # expense.save()
+
+        # messages.success(request, 'Expense updated  successfully')
+
+        # return redirect('expenses')
 
 
 def delete_expense(request, id):

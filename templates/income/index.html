@@ -43,10 +43,13 @@
             <table class="table table-stripped table-hover">
                 <thead>
                     <tr>
-                        <th>Amount ({{currency}})</th>
+                        <th>Amount ({{currency}}) <a href="?sort=amount_asc">&#9650; </a> <a
+                                href="?sort=amount_desc">&#9660;</a></th>
                         <th>Source</th>
                         <th>Description</th>
-                        <th>Date</th>
+                        <th>Date <a href="?sort=date_asc">&#9650;</a>
+                            <a href="?sort=date_desc">&#9660;</a>
+                        </th>
                         <th></th>
                     </tr>
                 </thead>
@@ -98,9 +101,9 @@
             <div class="">
                 Showing page {{page_obj.number}} of {{ page_obj.paginator.num_pages }}
             </div>
-            <ul class="pagination align-right float-right mr-auto">
+            <!-- <ul class="pagination align-right float-right mr-auto">
                 {% if page_obj.has_previous %}
-                <li {% if page_obj.number==1 %} class="page-item active" {% endif %}><a class="page-link"
+                <li {% if page_obj.number is 1 %} class="page-item active" {% endif %}><a class="page-link"
                         href="?page=1">&laquo; 1</a></li>
                 <li class="page-item"> <a class="page-link"
                         href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
@@ -113,6 +116,30 @@
                 {% endif %}
 
 
+            </ul> -->
+
+            <ul class="pagination align-right float-right mr-auto">
+                {% if page_obj.has_previous %}
+                <li {% if page_obj.number is 1 %} class="page-item active" {% endif %}>
+                    <a class="page-link" href="?page=1{% if sort_order %}&sort={{ sort_order }}{% endif %}">&laquo;
+                        1</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?page={{ page_obj.previous_page_number }}{% if sort_order %}&sort={{ sort_order }}{% endif %}">Previous</a>
+                </li>
+                {% endif %}
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?page={{ page_obj.next_page_number }}{% if sort_order %}&sort={{ sort_order }}{% endif %}">Next</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?page={{ page_obj.paginator.num_pages }}{% if sort_order %}&sort={{ sort_order }}{% endif %}">
+                        {{total}} &raquo;</a>
+                </li>
+                {% endif %}
             </ul>
             {% endif %}
         </div>

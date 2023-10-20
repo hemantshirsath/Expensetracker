@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+
+<div class="container">
+    <h1 class="mt-4 mb-4">Expense Forecast for Next 30 Days</h1>
+
+    <!-- Display the forecasted expenses in a responsive table -->
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Date</th>
+                    <th>Forecasted Expenses</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in forecast_data %}
+                <tr>
+                    <td>{{ row.Date }}</td>
+                    <td>{{ row.Forecasted_Expenses }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Display the total expenses at the end of the 30-day forecast period -->
+    <h2 class="mt-4">Total Predicted Expense at the end of 30 days:</h2><span> <b>{{ total_forecasted_expenses }}
+        </b></span>
+
+    <!-- Display the plot in a responsive container -->
+    <div class="mt-4">
+        <img src="{%static 'img/forecast_plot.png'%}" alt="Expense Forecast Plot" class="img-fluid">
+    </div>
+</div>
+
+<!-- Include Bootstrap JS and jQuery -->
+
+{% endblock content %}
