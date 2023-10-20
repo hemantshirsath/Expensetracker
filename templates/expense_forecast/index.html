@@ -2,9 +2,10 @@
 {% load static %}
 
 {% block content %}
-
-
-<div class="container">
+<div class="container mt-4">
+    {% if messages %}
+    {% include 'partials/_messages.html' %}
+    {% else %}
     <h1 class="mt-4 mb-4">Expense Forecast for Next 30 Days</h1>
 
     <!-- Display the forecasted expenses in a responsive table -->
@@ -28,15 +29,34 @@
     </div>
 
     <!-- Display the total expenses at the end of the 30-day forecast period -->
-    <h2 class="mt-4">Total Predicted Expense at the end of 30 days:</h2><span> <b>{{ total_forecasted_expenses }}
-        </b></span>
+    <h2 class="mt-4">Total Predicted Expense at the end of 30 days:</h2>
+    <span><b>{{ total_forecasted_expenses }}</b></span>
+
+    <!-- Display total forecasted expenses per category -->
+    <h2 class="mt-4">Total Forecasted Expenses per Category:</h2>
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Category</th>
+                    <th>Total Forecasted Expenses</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category, expenses in category_forecasts.items %}
+                <tr>
+                    <td>{{ category }}</td>
+                    <td>{{ expenses }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
     <!-- Display the plot in a responsive container -->
     <div class="mt-4">
-        <img src="{%static 'img/forecast_plot.png'%}" alt="Expense Forecast Plot" class="img-fluid">
+        <img src="{% static 'img/forecast_plot.png' %}" alt="Expense Forecast Plot" class="img-fluid">
     </div>
+    {% endif %}
 </div>
-
-<!-- Include Bootstrap JS and jQuery -->
-
 {% endblock content %}
