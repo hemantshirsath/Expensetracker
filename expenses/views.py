@@ -8,7 +8,42 @@ import json
 from django.http import JsonResponse
 from userpreferences.models import UserPreference
 import datetime
+import requests
+import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
 
+
+import requests
+import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.ensemble import RandomForestClassifier
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+import nltk
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from django.contrib import messages
+import datetime
+
+data = pd.read_csv('dataset.csv')
+
+# Preprocessing
+stop_words = set(stopwords.words('english'))
+
+def preprocess_text(text):
+    tokens = word_tokenize(text.lower())
+    tokens = [t for t in tokens if t.isalnum() and t not in stop_words]
+    return ' '.join(tokens)
+
+data['clean_description'] = data['description'].apply(preprocess_text)
+
+# Feature extraction
+tfidf_vectorizer = TfidfVectorizer()
+X = tfidf_vectorizer.fit_transform(data['clean_description'])
+
+# Train a RandomForestClassifier
+model = RandomForestClassifier()
+model.fit(X, data['category'])
 
 def search_expenses(request):
     if request.method == 'POST':
@@ -73,11 +108,26 @@ def add_expense(request):
             return render(request, 'expenses/add_expense.html', context)
         description = request.POST['description']
         date = request.POST['expense_date']
-        category = request.POST['category']
+        # category = request.POST['category']
+        predicted_category = request.POST['category']
 
         if not description:
             messages.error(request, 'description is required')
             return render(request, 'expenses/add_expense.html', context)
+        
+        initial_predicted_category = request.POST.get('initial_predicted_category')
+        if predicted_category != initial_predicted_category:
+            # Retrain the model with the updated dataset
+
+            new_data = {
+            'description': description,
+            'category': predicted_category,
+        }
+
+        # Call the UpdateDataset API to update the dataset and retrain the model
+        update_url = 'http://127.0.0.1:8000/api/update-dataset/'
+        response = requests.post(update_url, json={'new_data': new_data})
+
         try:
             # Convert the date string to a datetime object and validate the date
             date = datetime.datetime.strptime(date_str, '%Y-%m-%d').date()
@@ -88,9 +138,9 @@ def add_expense(request):
                 return render(request, 'expenses/add_expense.html', context)
 
             Expense.objects.create(owner=request.user, amount=amount, date=date,
-                                   category=category, description=description)
+                                   category=predicted_category, description=description)
             messages.success(request, 'Expense saved successfully')
-
+            
             return redirect('expenses')
         except ValueError:
             messages.error(request, 'Invalid date format')
@@ -194,3 +244,16 @@ def expense_category_summary(request):
 
 def stats_view(request):
     return render(request, 'expenses/stats.html')
+
+def predict_category(description):
+    predict_category_url = 'http://localhost:8000/api/predict-category/'  # Use the correct URL path
+    data = {'description': description}
+    response = requests.post(predict_category_url, data=data)
+
+    if response.status_code == 200:
+        # Get the predicted category from the response
+        predicted_category = response.json().get('predicted_category')
+        return predicted_category
+    else:
+        # Handle the case where the prediction request failed
+        return None

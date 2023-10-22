@@ -1,4 +1,9 @@
-{% extends 'base.html' %} {% block content %}
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+
 
 <div class="container mt-4">
     <nav aria-label="breadcrumb">
@@ -12,26 +17,45 @@
 
     <div class="card">
         <div class="card-body">
-            <form action="{% url 'add-expenses' %}" method="post">
-                {% include 'partials/_messages.html'%} {% csrf_token %}
+            <form action="{% url 'add-expenses' %}" method="post" id="expense-form">
+                {% include 'partials/_messages.html'%}
+                {% csrf_token %}
                 <div class="form-group">
                     <label for="">Amount</label>
                     <input type="number" class="form-control form-control-sm" name="amount" value="{{values.amount}}" />
                 </div>
                 <div class="form-group">
                     <label for="">Description</label>
-                    <input type="text" class="form-control form-control-sm" name="description"
+                    <input type="text" class="form-control form-control-sm" name="description" id="description-input"
                         value="{{values.description}}" />
+
+                    <!-- Loading indicator -->
+                    <div id="loading-indicator" style="display: none;">
+                        <img class="loader" src="{% static 'img/loader.gif' %}" alt="Loading..." width="25">
+                    </div>
+
+                    <!-- Predicted category display -->
+                    <!-- <div id="predicted-category" style="margin-top: 5px;"></div> -->
                 </div>
-                <div class="form-group">
+                <!-- <div class="form-group">
                     <label for="">Category</label>
-                    <select class="form-control" name="category">
+                    <select class="form-control" name="category" id="category-select">
                         {% for category in categories%}
                         <option name="category" value="{{category.name}}">{{category.name}}</option>
-
                         {% endfor %}
                     </select>
+                </div> -->
+                <input type="hidden" name="initial_predicted_category" id="initial-predicted-category"
+                    value="{{predicted_category}}">
+
+
+                <div class="form-group">
+                    <label for="">Category</label>
+                    <input type="text" class="form-control" name="category" id="category-input"
+                        value="{{values.category}}" />
                 </div>
+
+
                 <div class="form-group">
                     <label for="">Date of Expense</label>
                     <input type="date" class="form-control form-control-sm" name="expense_date" />
@@ -42,5 +66,64 @@
         </div>
     </div>
 </div>
+{% endblock content %}
 
-{% endblock %}
+<!-- Add JavaScript to make category predictions -->
+{% block js %}
+
+
+
+// Function to predict category based on description
+function predictCategory() {
+const description = document.getElementById('description-input').value;
+if (description) {
+// Display the loading indicator
+document.getElementById('loading-indicator').style.display = 'inline';
+
+// Send a request to your server to predict the category
+const formData = new FormData();
+formData.append('description', description);
+fetch('{% url "predict-category" %}', {
+method: 'POST',
+body: formData,
+headers: {
+'X-CSRFToken': getCookie('csrftoken')
+},
+})
+.then(response => response.json())
+.then(data => {
+// Hide the loading indicator
+document.getElementById('loading-indicator').style.display = 'none';
+
+// Update the category select input with the predicted category
+const categorySelect = document.getElementById('category-input');
+setTimeout(()=>{
+categorySelect.value = data.predicted_category;
+categorySelect.style.color="black";
+},3000);
+categorySelect.value="Predicting Category...."
+categorySelect.style.color="green";
+// Display the predicted category below the description input
+const predictedCategoryDiv = document.getElementById('predicted-category');
+predictedCategoryDiv.innerHTML = `Predicted Category: ${data.predicted_category}`;
+})
+.catch(error => {
+console.error('Error predicting category:', error);
+// Hide the loading indicator in case of an error
+document.getElementById('loading-indicator').style.display = 'none';
+categoryInput.value = data.predicted_category;
+});
+}
+}
+
+// Function to get the CSRF token from cookies
+function getCookie(name) {
+const value = `; ${document.cookie}`;
+const parts = value.split(`; ${name}=`);
+if (parts.length === 2) return parts.pop().split(';').shift();
+}
+
+// Listen for input changes in the description field
+const descriptionInput = document.getElementById('description-input');
+descriptionInput.addEventListener('input', predictCategory);
+{% endblock js %}

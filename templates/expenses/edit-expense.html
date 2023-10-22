@@ -33,7 +33,7 @@
                     <input type="text" class="form-control form-control-sm" name="description"
                         value="{{values.description}}" />
                 </div>
-                <div class="form-group">
+                <!-- <div class="form-group">
                     <label for="">Category</label>
                     <select class="form-control" name="category">
                         <option selected name="category" value="{{values.category}}">{{values.category}}</option>
@@ -42,6 +42,11 @@
 
                         {% endfor %}
                     </select>
+                </div> -->
+                <div class="form-group">
+                    <label for="">Category</label>
+                    <input type="text" class="form-control" name="category" id="category-input"
+                        value="{{values.category}}" />
                 </div>
                 <div class="form-group">
                     <label for="">Date of Expense</label>

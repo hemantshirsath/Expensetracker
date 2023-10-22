@@ -72,6 +72,8 @@ from django.utils.timezone import now
 from expenses.models import Expense
 from django.http import HttpResponse
 from django.contrib import messages
+import matplotlib.pyplot as plt
+
 
 # Fetch the data from the Expense model and create the forecast
 def forecast(request):
@@ -112,6 +114,19 @@ def forecast(request):
     # Calculate total forecasted expenses per category
     category_forecasts = data.groupby('Category')['Expenses'].sum().to_dict()
 
+    # Create a plot but save it without displaying it
+    plt.figure(figsize=(10, 6))
+    plt.plot(data.index, data['Expenses'], label='Previous Expenses')
+    plt.plot(forecast_index, forecast, label='Forecasted Expenses', color='red')
+    plt.xlabel('Date')
+    plt.ylabel('Expenses')
+    plt.title('Expense Forecast for Next 30 Days')
+    plt.legend()
+
+    # Save the plot to a file without displaying it
+    plot_file = 'static/img/forecast_plot.png'
+    plt.savefig(plot_file)
+    plt.close()
     # Pass the data to the template
     context = {
         'forecast_data': forecast_data_list,
