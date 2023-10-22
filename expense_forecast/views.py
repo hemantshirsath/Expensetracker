@@ -73,9 +73,11 @@ from expenses.models import Expense
 from django.http import HttpResponse
 from django.contrib import messages
 import matplotlib.pyplot as plt
+from django.contrib.auth.decorators import login_required
 
 
 # Fetch the data from the Expense model and create the forecast
+@login_required(login_url='/authentication/login')
 def forecast(request):
     # Fetch the latest 30 expenses for the current user
     expenses = Expense.objects.filter(owner=request.user).order_by('-date')[:30]

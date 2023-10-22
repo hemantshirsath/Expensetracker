@@ -44,7 +44,7 @@ X = tfidf_vectorizer.fit_transform(data['clean_description'])
 # Train a RandomForestClassifier
 model = RandomForestClassifier()
 model.fit(X, data['category'])
-
+@login_required(login_url='/authentication/login')
 def search_expenses(request):
     if request.method == 'POST':
         search_str = json.loads(request.body).get('searchText')
@@ -208,14 +208,14 @@ def expense_edit(request, id):
 
         # return redirect('expenses')
 
-
+@login_required(login_url='/authentication/login')
 def delete_expense(request, id):
     expense = Expense.objects.get(pk=id)
     expense.delete()
     messages.success(request, 'Expense removed')
     return redirect('expenses')
 
-
+@login_required(login_url='/authentication/login')
 def expense_category_summary(request):
     todays_date = datetime.date.today()
     six_months_ago = todays_date-datetime.timedelta(days=30*6)
@@ -241,10 +241,11 @@ def expense_category_summary(request):
 
     return JsonResponse({'expense_category_data': finalrep}, safe=False)
 
-
+@login_required(login_url='/authentication/login')
 def stats_view(request):
     return render(request, 'expenses/stats.html')
 
+@login_required(login_url='/authentication/login')
 def predict_category(description):
     predict_category_url = 'http://localhost:8000/api/predict-category/'  # Use the correct URL path
     data = {'description': description}

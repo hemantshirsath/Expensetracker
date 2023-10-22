@@ -7,8 +7,11 @@ from django.contrib.auth.decorators import login_required
 import json
 from django.http import JsonResponse
 import datetime
+from django.contrib.auth.decorators import login_required
+
 # Create your views here.
 
+@login_required(login_url='/authentication/login')
 
 def search_income(request):
     if request.method == 'POST':
@@ -161,7 +164,7 @@ def income_edit(request, id):
 
         # return redirect('income')
 
-
+@login_required(login_url='/authentication/login')
 def delete_income(request, id):
     income = UserIncome.objects.get(pk=id)
     income.delete()

@@ -13,6 +13,7 @@ from django.urls import reverse
 from .utils import account_activation_token
 from django.db import transaction
 from django.contrib import auth
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 
@@ -131,7 +132,7 @@ class VerificationView(View):
 
 
 class LogoutView(View):
-    def post(self, request):
+    def get(self, request):
         auth.logout(request)
         messages.success(request, "You have been logged out")
         return redirect('login')
