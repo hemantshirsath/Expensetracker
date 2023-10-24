@@ -1,3 +1,8 @@
+from django.db.models import Sum
+from django.utils import timezone
+from datetime import datetime, timedelta
+
+
 from django.shortcuts import render, redirect
 from .models import Source, UserIncome
 from django.core.paginator import Paginator
@@ -8,6 +13,22 @@ import json
 from django.http import JsonResponse
 import datetime
 from django.contrib.auth.decorators import login_required
+from datetime import date, timedelta
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.http import HttpResponse
+from .models import UserIncome
+from expenses.models import Expense
+from django.db.models import Sum
+import csv
+import openpyxl
+from io import BytesIO
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+
+
+from .models import UserIncome
 
 # Create your views here.
 
@@ -170,3 +191,211 @@ def delete_income(request, id):
     income.delete()
     messages.success(request, 'record removed')
     return redirect('income')
+
+
+def income_summary(request):
+    today = timezone.now()
+
+    # Calculate the date for one week ago
+    one_week_ago = today - timedelta(days=7)
+
+    # Calculate the first day of the current month
+    first_day_of_month = today.replace(day=1)
+    first_day_of_year = today.replace(month=1, day=1)
+
+    # Query the database to get daily, weekly, and monthly income
+    daily_income = UserIncome.objects.filter(date=today).aggregate(Sum('amount'))['amount__sum'] or 0
+    weekly_income = UserIncome.objects.filter(date__range=[one_week_ago, today]).aggregate(Sum('amount'))['amount__sum'] or 0
+    monthly_income = UserIncome.objects.filter(date__month=today.month).aggregate(Sum('amount'))['amount__sum'] or 0
+    yearly_income = UserIncome.objects.filter(date__year=today.year).aggregate(Sum('amount'))['amount__sum'] or 0
+    context = {
+        'daily_income': daily_income,
+        'weekly_income': weekly_income,
+        'monthly_income': monthly_income,
+        'yearly_income': yearly_income,
+        # You can add more context data here if needed
+    }
+    return render(request,'income/dashboard.html',context)
+
+
+
+
+@login_required(login_url='/authentication/login')
+def get_monthly_income(request):
+    today = date.today()
+    first_day_of_year = today.replace(month=1, day=1)
+    last_day_of_year = today.replace(month=12, day=31)
+
+    # Create a list to hold income data for all 12 months
+    monthly_data = [0] * 12
+
+    # Retrieve and fill in the actual monthly income data
+    income_data = UserIncome.objects.filter(
+        date__range=(first_day_of_year, last_day_of_year),
+        owner=request.user
+    ).values('date', 'amount')
+
+    for entry in income_data:
+        month = entry['date'].month - 1  # Convert month (1-12) to index (0-11)
+        monthly_data[month] = entry['amount']
+
+    return JsonResponse({'monthly_data': monthly_data})
+
+
+
+
+
+def render_to_pdf(template_path, context_dict):
+    template = get_template(template_path)
+    html = template.render(context_dict)
+    result = BytesIO()
+    pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), result)
+    if not pdf.err:
+        response = HttpResponse(result.getvalue(), content_type="application/pdf")
+        response["Content-Disposition"] = 'attachment; filename="expense_report.pdf"'
+        return response
+    return HttpResponse("Error rendering PDF", status=400)
+
+
+def export_pdf(request):
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    incomes = UserIncome.objects.filter(date__range=[start_date, end_date])
+    expenses = Expense.objects.filter(date__range=[start_date, end_date])
+    
+    total_income = incomes.aggregate(Sum('amount'))['amount__sum'] or 0
+    total_expense = expenses.aggregate(Sum('amount'))['amount__sum'] or 0
+    
+    savings = total_income - total_expense
+    
+    context = {
+        'incomes': incomes,
+        'expenses': expenses,
+        'total_income': total_income,
+        'total_expense': total_expense,
+        'savings': savings,
+        'start_date': start_date,
+        'end_date': end_date,
+    }
+    
+    pdf = render_to_pdf('income/pdf_template.html', context)
+    return pdf
+
+
+def report(request):
+    return render(request, 'income/report.html')
+
+def generate_report(request):
+    if request.method == "POST":
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+
+        if start_date > end_date:
+            messages.error(request, "Start date cannot be greater than end date.")
+            return redirect('report')
+
+        incomes = UserIncome.objects.filter(date__range=[start_date, end_date])
+        expenses = Expense.objects.filter(date__range=[start_date, end_date])
+
+        total_income = incomes.aggregate(Sum('amount'))['amount__sum'] or 0
+        total_expense = expenses.aggregate(Sum('amount'))['amount__sum'] or 0
+
+        savings = total_income - total_expense
+
+        context = {
+            'incomes': incomes,
+            'expenses': expenses,
+            'total_income': total_income,
+            'total_expense': total_expense,
+            'savings': savings,
+            'start_date': start_date,
+            'end_date': end_date,
+        }
+
+        return render(request, 'income/report.html', context)
+    else:
+        # Handle non-POST request here
+        # You can render the form again or perform other actions as needed
+        return render(request, 'income/report.html')
+
+def export_csv(request):
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    incomes = UserIncome.objects.filter(date__range=[start_date, end_date])
+    expenses = Expense.objects.filter(date__range=[start_date, end_date])
+    
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="report_{start_date}_to_{end_date}.csv'
+    
+    writer = csv.writer(response)
+    
+    # Label the income section
+    writer.writerow(['Income'])
+    writer.writerow(['Date', 'Source', 'Amount'])
+    
+    income_total = 0
+    for income in incomes:
+        writer.writerow([income.date, income.source, income.amount])
+        income_total += income.amount
+    
+    # Display the total income
+    writer.writerow(['', f'Total Income: {income_total}'])
+
+    # Label the expense section
+    writer.writerow(['Expenses'])
+    writer.writerow(['Date', 'Category', 'Amount'])
+    
+    expense_total = 0
+    for expense in expenses:
+        writer.writerow([expense.date, expense.category, expense.amount])
+        expense_total += expense.amount
+    
+    # Add an empty line
+    writer.writerow([])
+    
+    # Display the total expense
+    writer.writerow(['', f'Total Expenses: {expense_total}'])
+    
+    return response
+
+def export_xlsx(request):
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    incomes = UserIncome.objects.filter(date__range=[start_date, end_date])
+    expenses = Expense.objects.filter(date__range=[start_date, end_date])
+    
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = f'attachment; filename="report_{start_date}_to_{end_date}.xlsx"'
+    
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    
+    # Label the income section
+    ws.append(['Income'])
+    ws.append(['Date', 'Source', 'Amount'])
+    
+    income_total = 0
+    for income in incomes:
+        ws.append([income.date, income.source, income.amount])
+        income_total += income.amount
+    
+    # Display the total income
+    ws.append(['', f'Total Income: {income_total}'])
+
+    # Label the expense section
+    ws.append(['Expenses'])
+    ws.append(['Date', 'Category', 'Amount'])
+    
+    expense_total = 0
+    for expense in expenses:
+        ws.append([expense.date, expense.category, expense.amount])
+        expense_total += expense.amount
+    
+    # Add an empty line
+    ws.append([])
+    
+    # Display the total expense
+    ws.append(['', f'Total Expenses: {expense_total}'])
+    
+    wb.save(response)
+    return response

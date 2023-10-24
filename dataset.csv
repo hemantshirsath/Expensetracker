@@ -129,9 +129,9 @@ recharge mobile,utilities,recharge mobile
 salary credited,income,salary credited
 paid gym membership fees,health,paid gym membership fees
 purchased jeans shirts,clothes,purchased jeans shirts
-paid landlord,utilites,paid landlord
+paid landlord,utilities,paid landlord
 land lord payment,utilities,land lord payment
-purchased monthly groceries,grocery,purchased monthly groceries
+purchased monthly groceries,groceries,purchased monthly groceries
 recharged dishtv,entertainment,recharged dishtv
 purchased book,education,purchased book
 paid barber,grooming,paid barber
@@ -144,14 +144,19 @@ purchased earphones,electronic,purchased earphones
 buying vr set,entertainment,buying vr set
 purchased new cricket kit,sports,purchased new cricket kit
 purchased the badminton bats,sports,purchased badminton bats
-paid to the barber,utilites,paid barber
+paid to the barber,utilities,paid barber
 paid to the beauty parler,grooming,paid beauty parler
 purchased the grocery ,groceries,purchased grocery
 ate icecream,food,ate icecream
 ate icecream,food,ate icecream
-purchased new tv,Entertainment,purchased new tv
+purchased new tv,entertainment,purchased new tv
 paid to the landlord ,utilities,paid landlord
 paid the cylinder bill,utilities,paid cylinder bill
-purchased new school bag,Education,purchased new school bag
-today i purchased the college bag,Education,today purchased college bag
-purchased new college bag,Education,purchased new college bag
+purchased new school bag,education,purchased new school bag
+today i purchased the college bag,education,today purchased college bag
+purchased new college bag,education,purchased new college bag
+purchased new football,sports,purchased new football
+paid to the beauty parler,grooming,paid beauty parler
+paid to the landlord,utilities,paid landlord
+attended the concert of honey singh,entertainment,attended concert honey singh
+attended concert of neha kakkar,entertainment,attended concert neha kakkar

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Report</title>
+
+    <!-- Include Bootstrap CSS via CDN -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="text-center">
+            <h1 class="display-4">ExpenseWise</h1>
+            <h1 class="display-4">Expense Report</h1>
+        </div>
+
+        {% if incomes %}
+        <!-- Income Table -->
+        <h2>Total Income:</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Source</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for income in incomes %}
+                <tr>
+                    <td>{{ income.date }}</td>
+                    <td>{{ income.source }}</td>
+                    <td>&#8377; {{ income.amount }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+
+        {% if expenses %}
+        <!-- Expense Table -->
+        <h2>Total Expenses:</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Category</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for expense in expenses %}
+                <tr>
+                    <td>{{ expense.date }}</td>
+                    <td>{{ expense.category }}</td>
+                    <td>&#8377; {{ expense.amount }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+
+        {% if total_income is not None and total_expense is not None %}
+        <!-- Savings Calculation -->
+        <h2>Savings:</h2>
+        <table class="table table-bordered">
+            <tbody>
+                <tr>
+                    <td>Total Income:</td>
+                    <td>&#8377; {{ total_income }}</td>
+                </tr>
+                <tr>
+                    <td>Total Expenses:</td>
+                    <td>&#8377; {{ total_expense }}</td>
+                </tr>
+                <tr>
+                    <td>Total Savings:</td>
+                    <td>&#8377; {{ savings }}</td>
+                </tr>
+                <tr>
+                    <td>Status:</td>
+                    <td>
+                        {% if savings > 0 %}
+                        You saved money this period.
+                        {% elif savings == 0 %}
+                        Your income and expenses balanced.
+                        {% else %}
+                        You exceeded your income this period.
+                        {% endif %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+
+    <!-- Include Bootstrap JavaScript via CDN -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</body>
+
+</html>
