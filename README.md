@@ -1,4 +1,5 @@
 # Personal Expense Tracker
+![Expense Tracker UI](https://github.com/hemantshirsath/Expensetracker/assets/102463335/f31d97f4-4841-44cb-b2af-62286c60a0c9)
 
 ## Overview
 
