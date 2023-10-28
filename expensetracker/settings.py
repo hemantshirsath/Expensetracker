@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'expense_forecast',
     'rest_framework',
     'api',
+    'goals'
 ]
 
 MIDDLEWARE = [

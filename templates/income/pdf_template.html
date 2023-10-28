@@ -5,6 +5,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Expense Report</title>
+    <style>
+        .logo {
+            font-weight: bolder;
+            color: green;
+            text-align: center;
+            font-size: x-large;
+        }
+
+        th {
+            text-align: left;
+        }
+
+        h2 {
+            text-decoration: underline;
+        }
+    </style>
 
     <!-- Include Bootstrap CSS via CDN -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
@@ -13,7 +29,7 @@
 <body>
     <div class="container">
         <div class="text-center">
-            <h1 class="display-4">ExpenseWise</h1>
+            <h1 class="display-4 logo">ExpenseWise</h1>
             <h1 class="display-4">Expense Report</h1>
         </div>
 
@@ -33,7 +49,7 @@
                 <tr>
                     <td>{{ income.date }}</td>
                     <td>{{ income.source }}</td>
-                    <td>&#8377; {{ income.amount }}</td>
+                    <td> {{ income.amount }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -56,7 +72,7 @@
                 <tr>
                     <td>{{ expense.date }}</td>
                     <td>{{ expense.category }}</td>
-                    <td>&#8377; {{ expense.amount }}</td>
+                    <td> {{ expense.amount }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -70,25 +86,25 @@
             <tbody>
                 <tr>
                     <td>Total Income:</td>
-                    <td>&#8377; {{ total_income }}</td>
+                    <td> {{ total_income }}</td>
                 </tr>
                 <tr>
                     <td>Total Expenses:</td>
-                    <td>&#8377; {{ total_expense }}</td>
+                    <td> {{ total_expense }}</td>
                 </tr>
                 <tr>
                     <td>Total Savings:</td>
-                    <td>&#8377; {{ savings }}</td>
+                    <td> {{ savings }}</td>
                 </tr>
                 <tr>
                     <td>Status:</td>
                     <td>
                         {% if savings > 0 %}
-                        You saved money this period.
+                        <p style="color: green;"> You saved money this period.</p>
                         {% elif savings == 0 %}
-                        Your income and expenses balanced.
+                        <p style="color: yellow;"> Your income and expenses balanced.</p>
                         {% else %}
-                        You exceeded your income this period.
+                        <p style="color: red;"> You exceeded your expenses than your income this period.</p>
                         {% endif %}
                     </td>
                 </tr>

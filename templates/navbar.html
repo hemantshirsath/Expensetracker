@@ -3,6 +3,7 @@
 
 <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
     <style>
         .navbar {
             background-color: #e9ecef;
@@ -52,18 +53,21 @@
     <nav class="navbar">
         <ul>
             <li>
-                <i class="fas fa-user-circle" style="font-size:24px"></i>
                 {% if request.user.is_authenticated %}
+                <i class="fas fa-user-circle" style="font-size:24px"></i>
                 <a href="#" class="user">{{request.user.username|capfirst}}</a>
-                {% else %}
-                <a href="#" class="user">Guest</a>
-                {%endif%}
-
                 <div class="dropdown">
                     <a class="dropdown-content" href="#">Profile</a>
-                    <a class="dropdown-content" href="#">Settings</a>
+                    <a class="dropdown-content" href="{%url 'preferences'%}">Settings</a>
                     <a class="dropdown-content" href="{% url 'logout' %}">Logout</a>
                 </div>
+                {% else %}
+                <!-- <a href="#" class="user">Guest</a> -->
+                <a href="{%url 'login'%}">Login</a>
+                <a href="{%url 'register'%}">Register</a>
+                {%endif%}
+
+
             </li>
         </ul>
     </nav>

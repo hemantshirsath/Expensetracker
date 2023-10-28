@@ -29,7 +29,9 @@ from xhtml2pdf import pisa
 
 
 from .models import UserIncome
-
+from django.db.models import Sum
+from django.db.models.functions import ExtractMonth
+from datetime import datetime
 # Create your views here.
 
 @login_required(login_url='/authentication/login')
@@ -65,7 +67,10 @@ def index(request):
     paginator = Paginator(income, 5)
     page_number = request.GET.get('page')
     page_obj = Paginator.get_page(paginator, page_number)
-    currency = UserPreference.objects.get(user=request.user).currency
+    try:
+        currency = UserPreference.objects.get(user=request.user).currency
+    except:
+        currency=None
     total = page_obj.paginator.num_pages
     context = {
         'income': income,
@@ -103,8 +108,8 @@ def add_income(request):
 
         try:
             # Convert the date string to a datetime object and validate the date
-            date = datetime.datetime.strptime(date_str, '%Y-%m-%d').date()
-            today = datetime.date.today()
+            date = datetime.strptime(date_str, '%Y-%m-%d').date()
+            today = datetime.now().date()
 
             if date > today:
                 messages.error(request, 'Date cannot be in the future')
@@ -156,9 +161,10 @@ def income_edit(request, id):
 
         try:
             # Convert the date string to a datetime object and validate the date
-            date = datetime.datetime.strptime(date_str, '%Y-%m-%d').date()
-            today = datetime.date.today()
+            date = datetime.strptime(date_str, '%Y-%m-%d').date()
+            today = datetime.now().date()
 
+          
             if date > today:
                 messages.error(request, 'Date cannot be in the future')
                 return render(request, 'income/edit_income.html', context)
@@ -193,21 +199,21 @@ def delete_income(request, id):
     return redirect('income')
 
 
+@login_required(login_url='/authentication/login')
 def income_summary(request):
+    user = request.user  # Get the logged-in user
+
     today = timezone.now()
-
-    # Calculate the date for one week ago
     one_week_ago = today - timedelta(days=7)
-
-    # Calculate the first day of the current month
     first_day_of_month = today.replace(day=1)
     first_day_of_year = today.replace(month=1, day=1)
 
-    # Query the database to get daily, weekly, and monthly income
-    daily_income = UserIncome.objects.filter(date=today).aggregate(Sum('amount'))['amount__sum'] or 0
-    weekly_income = UserIncome.objects.filter(date__range=[one_week_ago, today]).aggregate(Sum('amount'))['amount__sum'] or 0
-    monthly_income = UserIncome.objects.filter(date__month=today.month).aggregate(Sum('amount'))['amount__sum'] or 0
-    yearly_income = UserIncome.objects.filter(date__year=today.year).aggregate(Sum('amount'))['amount__sum'] or 0
+    # Query the database to get daily, weekly, monthly, and yearly income for the logged-in user
+    daily_income = user.userincome_set.filter(date=today).aggregate(Sum('amount'))['amount__sum'] or 0
+    weekly_income = user.userincome_set.filter(date__range=[one_week_ago, today]).aggregate(Sum('amount'))['amount__sum'] or 0
+    monthly_income = user.userincome_set.filter(date__month=today.month).aggregate(Sum('amount'))['amount__sum'] or 0
+    yearly_income = user.userincome_set.filter(date__year=today.year).aggregate(Sum('amount'))['amount__sum'] or 0
+
     context = {
         'daily_income': daily_income,
         'weekly_income': weekly_income,
@@ -215,7 +221,66 @@ def income_summary(request):
         'yearly_income': yearly_income,
         # You can add more context data here if needed
     }
-    return render(request,'income/dashboard.html',context)
+    return render(request, 'income/dashboard.html', context)
+
+# @login_required(login_url='/authentication/login')
+# def income_summary(request):
+#     today = timezone.now()
+
+#     # Calculate the date for one week ago
+#     one_week_ago = today - timedelta(days=7)
+
+#     # Calculate the first day of the current month
+#     first_day_of_month = today.replace(day=1)
+#     first_day_of_year = today.replace(month=1, day=1)
+
+#     # Query the database to get daily, weekly, and monthly income
+#     daily_income = UserIncome.objects.filter(date=today).aggregate(Sum('amount'))['amount__sum'] or 0
+#     weekly_income = UserIncome.objects.filter(date__range=[one_week_ago, today]).aggregate(Sum('amount'))['amount__sum'] or 0
+#     monthly_income = UserIncome.objects.filter(date__month=today.month).aggregate(Sum('amount'))['amount__sum'] or 0
+#     yearly_income = UserIncome.objects.filter(date__year=today.year).aggregate(Sum('amount'))['amount__sum'] or 0
+#     context = {
+#         'daily_income': daily_income,
+#         'weekly_income': weekly_income,
+#         'monthly_income': monthly_income,
+#         'yearly_income': yearly_income,
+#         # You can add more context data here if needed
+#     }
+#     return render(request,'income/dashboard.html',context)
+
+
+
+
+# now added by me 
+from datetime import datetime
+
+def monthly_income_data(request):
+    # Get the current year
+    current_year = datetime.now().year
+
+    # Initialize a list to store monthly income data for the current year
+    monthly_income_data = [0] * 12  # Initialize with zeros for 12 months
+
+    # Get the monthly income data for the current year, grouped by month
+    monthly_data = (
+        UserIncome.objects
+        .filter(date__year=current_year)  # Filter for the current year
+        .annotate(month=ExtractMonth('date'))
+        .values('month')
+        .annotate(total_income=Sum('amount'))
+        .order_by('month')
+    )
+
+    # Populate the list with the income data
+    for item in monthly_data:
+        month_index = item['month'] - 1  # Subtract 1 to convert month to zero-based index
+        monthly_income_data[month_index] = item['total_income']
+
+    # Return the data as JSON
+    return JsonResponse({'monthly_income_data': monthly_income_data})
+
+
+
 
 
 
@@ -281,7 +346,7 @@ def export_pdf(request):
     pdf = render_to_pdf('income/pdf_template.html', context)
     return pdf
 
-
+@login_required(login_url='/authentication/login')
 def report(request):
     return render(request, 'income/report.html')
 
@@ -289,19 +354,23 @@ def generate_report(request):
     if request.method == "POST":
         start_date = request.POST.get('start_date')
         end_date = request.POST.get('end_date')
+        user = request.user
 
         if start_date > end_date:
             messages.error(request, "Start date cannot be greater than end date.")
             return redirect('report')
 
-        incomes = UserIncome.objects.filter(date__range=[start_date, end_date])
-        expenses = Expense.objects.filter(date__range=[start_date, end_date])
+        # incomes = UserIncome.objects.filter(date__range=[start_date, end_date])
+        # expenses = Expense.objects.filter(date__range=[start_date, end_date])
+
+        incomes = UserIncome.objects.filter(owner=user, date__range=[start_date, end_date])
+        expenses = Expense.objects.filter(owner=user, date__range=[start_date, end_date])
 
         total_income = incomes.aggregate(Sum('amount'))['amount__sum'] or 0
         total_expense = expenses.aggregate(Sum('amount'))['amount__sum'] or 0
 
         savings = total_income - total_expense
-
+        
         context = {
             'incomes': incomes,
             'expenses': expenses,
@@ -314,8 +383,7 @@ def generate_report(request):
 
         return render(request, 'income/report.html', context)
     else:
-        # Handle non-POST request here
-        # You can render the form again or perform other actions as needed
+        
         return render(request, 'income/report.html')
 
 def export_csv(request):

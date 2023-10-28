@@ -131,8 +131,12 @@ class VerificationView(View):
         return redirect('login')
 
 
+
 class LogoutView(View):
     def get(self, request):
-        auth.logout(request)
-        messages.success(request, "You have been logged out")
-        return redirect('login')
+        if request.user.is_authenticated:
+            auth.logout(request)
+            messages.success(request, "You have been logged out")
+            return redirect('login')
+        else:
+            return redirect('login')

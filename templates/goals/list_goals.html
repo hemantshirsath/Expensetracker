@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container p-5">
+    <h2>Goal List</h2>
+
+    {% for goal in goals %}
+    <div id="goal-{{ goal.id }}"
+        style="background-color: rgba(0, 128, 0, 0.2); padding: 20px; margin-bottom: 20px; border-radius: 5px;">
+        <h3>{{ goal.name }}</h3>
+        <p><strong>Start Date:</strong> {{ goal.start_date }}</p>
+        <p><strong>End Date:</strong> {{ goal.end_date }}</p>
+        <p><strong>Amount to Save:</strong> &#8377; {{ goal.amount_to_save }}</p>
+        <p><strong>Current Saved Amount:</strong> &#8377; {{ goal.current_saved_amount }}</p>
+        {% if goal.calculate_progress.saved_percentage > 0 %}
+        <div class="progress" style="height: 20px;">
+            <div class="progress-bar" role="progressbar" style="width: {{ goal.calculate_progress.saved_percentage }}%;"
+                aria-valuenow="{{ goal.calculate_progress.saved_percentage }}" aria-valuemin="0" aria-valuemax="100">
+                {{ goal.calculate_progress.saved_percentage }}%
+            </div>
+        </div>
+        {% else %}
+        <p>Progress not available</p>
+        {% endif %}
+        <p class="mt-2"><strong>Daily Savings Required:</strong> &#8377;
+            {{goal.calculate_progress.daily_savings_required }}
+        </p>
+
+
+        <form method="post" action="{% url 'add_amount' goal.id %}">
+            {% csrf_token %}
+            <div class="form-group">
+                {{ add_amount_form.additional_amount.label_tag }}
+                {{ add_amount_form.additional_amount }}
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">Add Amount</button>
+
+        </form>
+        <form method="post" class="mt-2" action="{% url 'delete_goal' goal.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger btn-sm">Delete Goal</button>
+        </form>
+    </div>
+
+
+    {% endfor %}
+
+    <a href="{% url 'add_goal' %}" class="btn btn-primary">Add Goal</a>
+</div>
+{% endblock %}

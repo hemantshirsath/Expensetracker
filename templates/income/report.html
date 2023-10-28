@@ -1,12 +1,18 @@
 {% extends "base.html" %}
 {% block css %}
 <style>
+    .green {
+        color: green;
+    }
 
+    .red {
+        color: red;
+    }
 </style>
 {% endblock css %}
 {% block content %}
 <div class="container m-3">
-    <h1>Expense Report</h1>
+    <h1>Income-Expense Report</h1>
 
     <!-- Error Messages -->
     {% if messages %}
@@ -85,27 +91,31 @@
     <h2>Savings:</h2>
     <p>Total Income: &#8377; {{ total_income }}</p>
     <p>Total Expenses: &#8377; {{ total_expense }}</p>
-    <p>Total Savings: &#8377; {{ savings }}</p>
+    <p>Total Savings: &#8377;
+        {% if savings < 0 %} 0 {%else%} {{ savings }} {% endif %} </p>
 
-    {% if savings > 0 %}
-    <p>You saved money this period.</p>
-    {% elif savings == 0 %}
-    <p>Your income and expenses balanced.</p>
-    {% else %}
-    <p>You exceeded your income this period.</p>
-    {% endif %}
-    {% endif %}
+            {% if savings > 0 %}
+            <p class="green">You saved money this period.</p>
+            {% elif savings == 0 %}
+            <p class="green">Your income and expenses balanced.</p>
+            {% else %}
+            <p class="red">You exceeded your Expenses than your income this period.</p>
+            {% endif %}
+            {% endif %}
 
-    <!-- Export Options -->
-    <h2>Export Options:</h2>
-    <a href="{% url 'export_pdf' %}?start_date={{ start_date }}&end_date={{ end_date }}" class="btn btn-success">Export
-        as
-        PDF</a>
-    <a href="{% url 'export_csv' %}?start_date={{ start_date }}&end_date={{ end_date }}" class="btn btn-info">Export as
-        CSV</a>
-    <a href="{% url 'export_xlsx' %}?start_date={{ start_date }}&end_date={{ end_date }}" class="btn btn-warning">Export
-        as
-        XLSX</a>
-    <!-- Include Bootstrap JS -->
+            <!-- Export Options -->
+            <h2>Export Options:</h2>
+            <a href="{% url 'export_pdf' %}?start_date={{ start_date }}&end_date={{ end_date }}"
+                class="btn btn-success">Export
+                as
+                PDF</a>
+            <a href="{% url 'export_csv' %}?start_date={{ start_date }}&end_date={{ end_date }}"
+                class="btn btn-info">Export as
+                CSV</a>
+            <a href="{% url 'export_xlsx' %}?start_date={{ start_date }}&end_date={{ end_date }}"
+                class="btn btn-warning">Export
+                as
+                XLSX</a>
+            <!-- Include Bootstrap JS -->
 </div>
 {% endblock content %}

@@ -10,7 +10,7 @@
     rel="stylesheet">
 
 <!-- Custom styles for this template-->
-<link href="{%static 'css/sb-admin-2.min.css'}" rel="stylesheet">
+<link href="{%static 'css/sb-admin-2.min.css %'}" rel="stylesheet">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 {% endblock link %}
@@ -42,7 +42,7 @@
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
                         <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
-                        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+                        <a href="{%url 'report'%}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
                                 class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
                     </div>
 
@@ -167,7 +167,7 @@
                                 <!-- Card Body -->
                                 <div class="card-body">
                                     <div class="chart-area">
-                                        <canvas id="myAreaChart"></canvas>
+                                        <canvas id="myAreaChart" data-url="{% url 'monthly_income_data' %}"></canvas>
                                     </div>
                                 </div>
                             </div>
@@ -202,13 +202,13 @@
                                     </div>
                                     <div class="mt-4 text-center small">
                                         <span class="mr-2">
-                                            <i class="fas fa-circle text-primary"></i> Direct
+                                            <i class="fas fa-circle text-primary"></i> JOB
                                         </span>
                                         <span class="mr-2">
-                                            <i class="fas fa-circle text-success"></i> Social
+                                            <i class="fas fa-circle text-success"></i> FREELANCING
                                         </span>
                                         <span class="mr-2">
-                                            <i class="fas fa-circle text-info"></i> Referral
+                                            <i class="fas fa-circle text-info"></i> SHAREMARKET
                                         </span>
                                     </div>
                                 </div>
@@ -255,5 +255,20 @@
 
             {% endblock content %}
             {% block js %}
+            // Get the canvas element
+            var ctx = document.getElementById("myAreaChart");
+            var url = ctx.getAttribute('data-url'); // Get the data URL from the canvas element
+
+            // Fetch the monthly income data using AJAX
+            fetch(url)
+            .then(response => response.json())
+            .then(data => {
+            var monthlyIncomeData = data.monthly_income_data;
+
+            // Update the chart with the fetched data
+            myLineChart.data.datasets[0].data = monthlyIncomeData;
+            myLineChart.update();
+            })
+            .catch(error => console.error("Error fetching data:", error));
 
             {% endblock js %}
