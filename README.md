@@ -1,4 +1,9 @@
 # Personal Expense Tracker
+![Expense Tracker UI](https://github.com/hemantshirsath/Expensetracker/assets/102463335/f31d97f4-4841-44cb-b2af-62286c60a0c9)
+![forecast Expense UI ](https://github.com/hemantshirsath/Expensetracker/assets/102463335/c1188567-39c5-4cc1-8916-24f3d3712ee8)
+
+![forecast Expense UI 2](https://github.com/hemantshirsath/Expensetracker/assets/102463335/a2088949-c4f6-4d18-ba23-308ce3ad19f4)
+![report ui Expensewise](https://github.com/hemantshirsath/Expensetracker/assets/102463335/c3271340-d3ea-4171-9618-04c8c0a98759)
 
 ## Overview
 
