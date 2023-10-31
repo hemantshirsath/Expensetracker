@@ -17,7 +17,8 @@ def add_goal(request):
 
 @login_required(login_url='/authentication/login')
 def list_goals(request):
-    user=request.user
+
+    # goals = Goal.objects.all()
     goals = Goal.objects.filter()
     add_amount_form = AddAmountForm() 
     return render(request, 'goals/list_goals.html', {'goals': goals, 'add_amount_form': add_amount_form})
