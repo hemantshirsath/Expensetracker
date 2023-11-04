@@ -348,13 +348,15 @@ def export_pdf(request):
 
 @login_required(login_url='/authentication/login')
 def report(request):
-    return render(request, 'income/report.html')
+    report_generated=False
+    return render(request, 'income/report.html',{'report_generated':report_generated})
 
 def generate_report(request):
     if request.method == "POST":
         start_date = request.POST.get('start_date')
         end_date = request.POST.get('end_date')
         user = request.user
+        report_generated=True
 
         if start_date > end_date:
             messages.error(request, "Start date cannot be greater than end date.")
@@ -379,6 +381,7 @@ def generate_report(request):
             'savings': savings,
             'start_date': start_date,
             'end_date': end_date,
+            'report_generated':report_generated
         }
 
         return render(request, 'income/report.html', context)

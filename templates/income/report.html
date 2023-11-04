@@ -36,7 +36,7 @@
                 <input type="date" name="end_date" class="form-control" required>
             </div>
         </div>
-        <button type="submit" class="btn btn-primary">Generate Report</button>
+        <button type="submit" id="generate-report" class="btn btn-primary">Generate Report</button>
     </form>
 
 
@@ -104,18 +104,26 @@
             {% endif %}
 
             <!-- Export Options -->
-            <h2>Export Options:</h2>
-            <a href="{% url 'export_pdf' %}?start_date={{ start_date }}&end_date={{ end_date }}"
-                class="btn btn-success">Export
-                as
-                PDF</a>
-            <a href="{% url 'export_csv' %}?start_date={{ start_date }}&end_date={{ end_date }}"
-                class="btn btn-info">Export as
-                CSV</a>
-            <a href="{% url 'export_xlsx' %}?start_date={{ start_date }}&end_date={{ end_date }}"
-                class="btn btn-warning">Export
-                as
-                XLSX</a>
+            <div>
+                {% if report_generated %}
+
+
+                <h2>Export Options:</h2>
+                <a href="{% url 'export_pdf' %}?start_date={{ start_date }}&end_date={{ end_date }}"
+                    class="btn btn-success">Export
+                    as
+                    PDF</a>
+                <a href="{% url 'export_csv' %}?start_date={{ start_date }}&end_date={{ end_date }}"
+                    class="btn btn-info">Export as
+                    CSV</a>
+                <a href="{% url 'export_xlsx' %}?start_date={{ start_date }}&end_date={{ end_date }}"
+                    class="btn btn-warning">Export
+                    as
+                    XLSX</a>
+                {% endif %}
+            </div>
+
             <!-- Include Bootstrap JS -->
 </div>
+
 {% endblock content %}
