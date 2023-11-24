@@ -25,5 +25,6 @@ urlpatterns = [
     path('income/', include('userincome.urls')),
     path('forecast/', include('expense_forecast.urls')),
     path('api/', include('api.urls')),
-    path('goals/',include('goals.urls'))
+    path('goals/',include('goals.urls')),
+    path('account/',include('userprofile.urls'))
 ]

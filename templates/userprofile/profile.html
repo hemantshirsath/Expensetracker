@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block css %}
+<style>
+    .container {
+        height: 100vh;
+        width: 80%;
+        margin: auto;
+    }
+
+    .form {
+        height: 100%;
+        width: 50%;
+        padding: 20px;
+
+    }
+
+    h3 {
+        padding: 20px;
+    }
+
+    .message {
+        margin-bottom: 30px;
+        padding: 10px;
+        padding-left: 0;
+    }
+
+    .label {
+        margin-right: 20px;
+        height: auto;
+        min-width: 100px;
+        display: inline-block;
+        margin: auto;
+    }
+</style>
+{% endblock css %}
+
+{% block content %}
+<div class="container">
+    <h3>Welcome {{request.user.username|capfirst}} !</h3>
+    <form action="" class="form" method="post">
+
+        {% csrf_token %}
+        <table>
+            {% for fm in form %}
+            <p class="label"> {{fm.label_tag}} </p> {{fm}} {{fm.errors|striptags}} <br><br>
+            {% endfor %}
+        </table>
+        <input type="submit" class="btn btn-primary" value="Update">
+        <div class="message">
+            {% if messages %}
+            {% for message in messages %}
+            <div {% if message.tags %} class="alert-{{message.tags}}" {% endif %}>{{message}}</div>
+            {% endfor %}
+            {% endif %}
+        </div>
+    </form>
+
+</div>
+{% endblock content %}
