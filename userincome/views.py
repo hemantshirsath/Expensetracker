@@ -3,7 +3,7 @@ from django.utils import timezone
 from datetime import datetime, timedelta
 
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect,HttpResponseRedirect
 from .models import Source, UserIncome
 from django.core.paginator import Paginator
 from userpreferences.models import UserPreference
@@ -50,7 +50,7 @@ def search_income(request):
 
 @login_required(login_url='/authentication/login')
 def index(request):
-    categories = Source.objects.all()
+    categories = Source.objects.filter(owner=request.user)
     income = UserIncome.objects.filter(owner=request.user)
 
     sort_order = request.GET.get('sort')
@@ -84,7 +84,10 @@ def index(request):
 
 @login_required(login_url='/authentication/login')
 def add_income(request):
-    sources = Source.objects.all()
+    sources = Source.objects.filter(owner=request.user)
+    if(len(sources)==0):
+        messages.info(request,"you need to add income sources first in order to add income")
+        return HttpResponseRedirect('/account/')
     context = {
         'sources': sources,
         'values': request.POST

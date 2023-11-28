@@ -21,6 +21,7 @@ class UserIncome(models.Model):
 
 class Source(models.Model):
     name = models.CharField(max_length=255)
+    owner = models.ForeignKey(to=User, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name

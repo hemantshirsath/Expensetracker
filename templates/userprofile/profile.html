@@ -5,14 +5,19 @@
         height: 100vh;
         width: 80%;
         margin: auto;
+        display: flex;
+        justify-content: space-between;
+
     }
 
     .form {
         height: 100%;
         width: 50%;
         padding: 20px;
+        margin: 5%;
 
     }
+
 
     h3 {
         padding: 20px;
@@ -31,29 +36,52 @@
         display: inline-block;
         margin: auto;
     }
+
+    .danger {
+        margin: 10px;
+    }
 </style>
 {% endblock css %}
 
 {% block content %}
 <div class="container">
-    <h3>Welcome {{request.user.username|capfirst}} !</h3>
+
     <form action="" class="form" method="post">
+        {% if messages %}
+        <div class="message">
+
+            {% for message in messages %}
+            <div {% if message.tags %} class="alert-{{message.tags}}" {% endif %}>{{message}}</div>
+            {% endfor %}
+        </div>
+
+        {% endif %}
+        <h3>Welcome {{request.user.username|capfirst}} !</h3>
+
 
         {% csrf_token %}
         <table>
             {% for fm in form %}
-            <p class="label"> {{fm.label_tag}} </p> {{fm}} {{fm.errors|striptags}} <br><br>
+            <p class="label"> {{fm.label_tag}} </p> {{fm}} <span class="alert-danger danger"> {{fm.errors|striptags}}
+            </span><br><br>
             {% endfor %}
         </table>
         <input type="submit" class="btn btn-primary" value="Update">
-        <div class="message">
-            {% if messages %}
-            {% for message in messages %}
-            <div {% if message.tags %} class="alert-{{message.tags}}" {% endif %}>{{message}}</div>
-            {% endfor %}
-            {% endif %}
-        </div>
+
     </form>
 
+    <div class="form">
+        <form action="{%url 'addSource'%}" method="POST">
+            {% csrf_token %}
+            Add Income Sources :
+            <input type="text" placeholder="Source" name="Source">
+            <input type="submit" class="btn btn-primary">
+        </form>
+        <div>
+            {% for source in sources %}
+            <li class="list">{{source}} <a href="{%url 'deleteSource' source.id%}"> Delete</a></li>
+            {% endfor %}
+        </div>
+    </div>
 </div>
 {% endblock content %}
