@@ -9,7 +9,9 @@ def add_goal(request):
     if request.method == 'POST':
         form = GoalForm(request.POST)
         if form.is_valid():
-            form.save()
+            goal=form.save()
+            goal.owner=request.user
+            goal.save()
             return redirect('list_goals')
 
     form = GoalForm()
@@ -19,7 +21,8 @@ def add_goal(request):
 def list_goals(request):
 
     # goals = Goal.objects.all()
-    goals = Goal.objects.filter()
+    goals = Goal.objects.filter(owner=request.user)
+    print("HEY hemant this is length of goals ",len(goals))
     add_amount_form = AddAmountForm() 
     return render(request, 'goals/list_goals.html', {'goals': goals, 'add_amount_form': add_amount_form})
 
@@ -36,9 +39,8 @@ def add_amount(request, goal_id):
 
 def delete_goal(request, goal_id):
     try:
-        goal = Goal.objects.get(id=goal_id)
+        goal = Goal.objects.get(id=goal_id,owner=request.user)
         goal.delete()
         return redirect('list_goals')
     except Goal.DoesNotExist:
-        # Handle goal not found error or any other appropriate action
         pass
