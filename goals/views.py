@@ -22,7 +22,7 @@ def list_goals(request):
 
     # goals = Goal.objects.all()
     goals = Goal.objects.filter(owner=request.user)
-    print("HEY hemant this is length of goals ",len(goals))
+  
     add_amount_form = AddAmountForm() 
     return render(request, 'goals/list_goals.html', {'goals': goals, 'add_amount_form': add_amount_form})
 

@@ -61,7 +61,7 @@
                     <input type="date" class="form-control form-control-sm" name="expense_date" />
                 </div>
 
-                <input type="submit" value="Submit" class="btn btn-primary btn-primary-sm" />
+                <input type="submit" id="btn" value="Submit" class="btn btn-primary btn-primary-sm" />
             </form>
         </div>
     </div>
@@ -108,10 +108,10 @@ const predictedCategoryDiv = document.getElementById('predicted-category');
 predictedCategoryDiv.innerHTML = `Predicted Category: ${data.predicted_category}`;
 })
 .catch(error => {
-console.error('Error predicting category:', error);
+<!-- console.error('Error predicting category:', error); -->
 // Hide the loading indicator in case of an error
 document.getElementById('loading-indicator').style.display = 'none';
-categoryInput.value = data.predicted_category;
+<!-- categoryInput.value = data.predicted_category; -->
 });
 }
 }

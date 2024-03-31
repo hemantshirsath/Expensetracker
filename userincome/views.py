@@ -254,7 +254,6 @@ def income_summary(request):
 
 
 
-# now added by me 
 from datetime import datetime
 
 def monthly_income_data(request):

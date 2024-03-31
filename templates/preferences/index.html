@@ -24,6 +24,18 @@
         </div>
     </form>
 </div>
+<div class="container mt-5">
+    <h5 class="mt-5">Your Current Daily Expense Limit is : <b> {{daily_expense_limit}} </b></h5>
+    <form action="{%url 'set-daily-expense-limit'%}" method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <h5> <label for="exampleInputEmail1">Set Daily Expense Limit</label></h5>
+            <input type="number" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+                placeholder="Enter daily Expense Limit" name="daily_expense_limit">
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
 
 
 <hr />

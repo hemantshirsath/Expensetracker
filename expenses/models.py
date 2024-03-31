@@ -27,3 +27,7 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+
+class ExpenseLimit(models.Model):
+    owner = models.ForeignKey(to=User, on_delete=models.CASCADE)
+    daily_expense_limit=models.IntegerField()

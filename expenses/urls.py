@@ -14,5 +14,6 @@ urlpatterns = [
          name="expense_category_summary"),
     path('stats', views.stats_view,
          name="stats"),
+    path('set-daily-expense-limit/',views.set_expense_limit,name="set-daily-expense-limit")
 
 ]

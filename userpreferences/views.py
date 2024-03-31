@@ -5,12 +5,13 @@ from django.conf import settings
 from .models import UserPreference
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-
+from expenses.models import ExpenseLimit
 # Create your views here.
 
 @login_required(login_url='/authentication/login')
 
 def index(request):
+    daily_expense_limit=ExpenseLimit.objects.filter(owner=request.user).first()
     currency_data = []
     exists = UserPreference.objects.filter(user=request.user).exists()
     user_preferences = None
@@ -23,7 +24,7 @@ def index(request):
             for k, v in data.items():
                 currency_data.append({'name': k, 'value': v})
 
-        return render(request, 'preferences/index.html', {'currencies': currency_data, 'user_preferences': user_preferences})
+        return render(request, 'preferences/index.html', {'currencies': currency_data, 'user_preferences': user_preferences,'daily_expense_limit':daily_expense_limit.daily_expense_limit})
     else:
         currency = request.POST['currency']
         if exists:
@@ -32,4 +33,4 @@ def index(request):
         else:
             UserPreference.objects.create(user=request.user, currency=currency)
         messages.success(request, "Changes saved successfully")
-        return render(request, 'preferences/index.html', {'currencies': currency_data, 'user_preferences': user_preferences})
+        return render(request, 'preferences/index.html', {'currencies': currency_data, 'user_preferences': user_preferences,'daily_expense_limit':daily_expense_limit.daily_expense_limit})

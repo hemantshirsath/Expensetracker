@@ -10,8 +10,8 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 import nltk
 import json
-from rest_framework.permissions import IsAuthenticated
-from .serializers import YourDataSerializer  # Create a serializer for your data
+from rest_framework.permissions import IsAuthenticated 
+from .serializers import YourDataSerializer  
 
 
 nltk.download('punkt')
@@ -23,9 +23,6 @@ class PredictCategory(APIView):
 
     def post(self, request):
         user_input = request.data.get('description')
-        # Include your preprocessing and model prediction code here
-        # Load your dataset and train your model
-        # Update the path
         data = pd.read_csv(
             'dataset.csv')
         tfidf_vectorizer = TfidfVectorizer()

@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect,HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from .models import Category, Expense
 from django.contrib import messages
@@ -11,8 +11,8 @@ import datetime
 import requests
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
-
-
+from django.contrib.sessions.models import Session
+from datetime import date
 import requests
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -24,7 +24,9 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib import messages
 import datetime
-
+from .models import ExpenseLimit
+from django.core.mail import send_mail
+from django.conf import settings
 data = pd.read_csv('dataset.csv')
 
 # Preprocessing
@@ -92,6 +94,7 @@ def index(request):
     }
     return render(request, 'expenses/index.html', context)
 
+daily_expense_amounts = {}
 
 @login_required(login_url='/authentication/login')
 def add_expense(request):
@@ -106,13 +109,12 @@ def add_expense(request):
     if request.method == 'POST':
         amount = request.POST['amount']
         date_str = request.POST.get('expense_date')
-
+        
         if not amount:
             messages.error(request, 'Amount is required')
             return render(request, 'expenses/add_expense.html', context)
         description = request.POST['description']
         date = request.POST['expense_date']
-        # category = request.POST['category']
         predicted_category = request.POST['category']
 
         if not description:
@@ -121,30 +123,42 @@ def add_expense(request):
         
         initial_predicted_category = request.POST.get('initial_predicted_category')
         if predicted_category != initial_predicted_category:
-            # Retrain the model with the updated dataset
-
             new_data = {
             'description': description,
             'category': predicted_category,
         }
 
-        # Call the UpdateDataset API to update the dataset and retrain the model
         update_url = 'http://127.0.0.1:8000/api/update-dataset/'
         response = requests.post(update_url, json={'new_data': new_data})
 
         try:
-            # Convert the date string to a datetime object and validate the date
             date = datetime.datetime.strptime(date_str, '%Y-%m-%d').date()
             today = datetime.date.today()
 
             if date > today:
                 messages.error(request, 'Date cannot be in the future')
                 return render(request, 'expenses/add_expense.html', context)
+            
+            user = request.user
+            expense_limits = ExpenseLimit.objects.filter(owner=user)
+            if expense_limits.exists():
+                daily_expense_limit = expense_limits.first().daily_expense_limit
+            else:
+                daily_expense_limit = 5000  
+
+            
+            total_expenses_today = get_expense_of_day(user) + float(amount)
+            if total_expenses_today > daily_expense_limit:
+                subject = 'Daily Expense Limit Exceeded'
+                message = f'Hello {user.username},\n\nYour expenses for today have exceeded your daily expense limit. Please review your expenses.'
+                from_email = settings.EMAIL_HOST_USER
+                to_email = [user.email]
+                send_mail(subject, message, from_email, to_email, fail_silently=False)
+                messages.warning(request, 'Your expenses for today exceed your daily expense limit')
 
             Expense.objects.create(owner=request.user, amount=amount, date=date,
                                    category=predicted_category, description=description)
             messages.success(request, 'Expense saved successfully')
-            
             return redirect('expenses')
         except ValueError:
             messages.error(request, 'Invalid date format')
@@ -262,3 +276,28 @@ def predict_category(description):
     else:
         # Handle the case where the prediction request failed
         return None
+    
+
+def set_expense_limit(request):
+    if request.method == "POST":
+        daily_expense_limit = request.POST.get('daily_expense_limit')
+        
+        existing_limit = ExpenseLimit.objects.filter(owner=request.user).first()
+        
+        if existing_limit:
+            existing_limit.daily_expense_limit = daily_expense_limit
+            existing_limit.save()
+        else:
+            ExpenseLimit.objects.create(owner=request.user, daily_expense_limit=daily_expense_limit)
+        
+        messages.success(request, "Daily Expense Limit Updated Successfully!")
+        return HttpResponseRedirect('/preferences/')
+    else:
+        return HttpResponseRedirect('/preferences/')
+    
+def get_expense_of_day(user):
+    current_date=date.today()
+    expenses=Expense.objects.filter(owner=user,date=current_date)
+    total_expenses=sum(expense.amount for expense in expenses)
+    return total_expenses
+    

@@ -140,7 +140,7 @@
 
                     <!-- Content Row -->
 
-                    <div class="row">
+                    <div class="row justify-content-center">
 
                         <!-- Area Chart -->
                         <div class="col-xl-8 col-lg-7">
@@ -174,9 +174,8 @@
                         </div>
 
                         <!-- Pie Chart -->
-                        <div class="col-xl-4 col-lg-5">
+                        <!-- <div class="col-xl-4 col-lg-5">
                             <div class="card shadow mb-4">
-                                <!-- Card Header - Dropdown -->
                                 <div
                                     class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                                     <h6 class="m-0 font-weight-bold text-primary">Revenue Sources</h6>
@@ -195,7 +194,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <!-- Card Body -->
+                             
                                 <div class="card-body">
                                     <div class="chart-pie pt-4 pb-2">
                                         <canvas id="myPieChart"></canvas>
@@ -214,61 +213,61 @@
                                 </div>
                             </div>
                         </div>
+                    </div> -->
+
+
+
                     </div>
-
-
+                    <!-- End of Content Wrapper -->
 
                 </div>
-                <!-- End of Content Wrapper -->
+                <!-- End of Page Wrapper -->
 
-            </div>
-            <!-- End of Page Wrapper -->
+                <!-- Scroll to Top Button-->
+                <a class="scroll-to-top rounded" href="#page-top">
+                    <i class="fas fa-angle-up"></i>
+                </a>
 
-            <!-- Scroll to Top Button-->
-            <a class="scroll-to-top rounded" href="#page-top">
-                <i class="fas fa-angle-up"></i>
-            </a>
+                <!-- Logout Modal-->
 
-            <!-- Logout Modal-->
+                <script src="{%static 'js/jquery.min.js'%}"></script>
+                <script src="{%static 'js/bootstrap.bundle.min.js' %}"></script>
 
-            <script src="{%static 'js/jquery.min.js'%}"></script>
-            <script src="{%static 'js/bootstrap.bundle.min.js' %}"></script>
+                <!-- Core plugin JavaScript-->
+                <script src="{%static 'js/jquery.easing.min.js' %}"></script>
 
-            <!-- Core plugin JavaScript-->
-            <script src="{%static 'js/jquery.easing.min.js' %}"></script>
+                <!-- Custom scripts for all pages-->
+                <script src="{%static 'js/sb-admin-2.min.js' %}"></script>
 
-            <!-- Custom scripts for all pages-->
-            <script src="{%static 'js/sb-admin-2.min.js' %}"></script>
+                <!-- Page level plugins -->
+                <script src="{%static 'js/Chart.min.js' %}"></script>
 
-            <!-- Page level plugins -->
-            <script src="{%static 'js/Chart.min.js' %}"></script>
-
-            <!-- Page level custom scripts -->
-            <script src="{% static 'js/chart-area-demo.js' %}"></script>
-            <script src="{% static 'js/chart-pie-demo.js' %}"></script>
-            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-            <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
-            <!-- The rest of your script includes... -->
+                <!-- Page level custom scripts -->
+                <script src="{% static 'js/chart-area-demo.js' %}"></script>
+                <script src="{% static 'js/chart-pie-demo.js' %}"></script>
+                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+                <!-- The rest of your script includes... -->
 
 
 
-            {% endblock content %}
-            {% block js %}
-            // Get the canvas element
-            var ctx = document.getElementById("myAreaChart");
-            var url = ctx.getAttribute('data-url'); // Get the data URL from the canvas element
+                {% endblock content %}
+                {% block js %}
+                // Get the canvas element
+                var ctx = document.getElementById("myAreaChart");
+                var url = ctx.getAttribute('data-url'); // Get the data URL from the canvas element
 
-            // Fetch the monthly income data using AJAX
-            fetch(url)
-            .then(response => response.json())
-            .then(data => {
-            var monthlyIncomeData = data.monthly_income_data;
+                // Fetch the monthly income data using AJAX
+                fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                var monthlyIncomeData = data.monthly_income_data;
 
-            // Update the chart with the fetched data
-            myLineChart.data.datasets[0].data = monthlyIncomeData;
-            myLineChart.update();
-            })
-            .catch(error => console.error("Error fetching data:", error));
+                // Update the chart with the fetched data
+                myLineChart.data.datasets[0].data = monthlyIncomeData;
+                myLineChart.update();
+                })
+                .catch(error => console.error("Error fetching data:", error));
 
-            {% endblock js %}
+                {% endblock js %}

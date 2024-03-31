@@ -7,7 +7,6 @@
         margin: auto;
         display: flex;
         justify-content: space-between;
-
     }
 
     .form {
@@ -15,6 +14,15 @@
         width: 50%;
         padding: 20px;
         margin: 5%;
+
+    }
+
+    .form1 {
+        height: 50%;
+        width: 50%;
+        padding: 20px;
+        margin: 5%;
+        margin-top: 15%;
 
     }
 
@@ -39,6 +47,21 @@
 
     .danger {
         margin: 10px;
+    }
+
+    @media (max-width:850px) {
+        .container {
+            display: block;
+        }
+
+        .form,
+        .form1 {
+            height: 65%;
+            width: 100%;
+            border: 2px solid red;
+        }
+
+
     }
 </style>
 {% endblock css %}
@@ -70,12 +93,12 @@
 
     </form>
 
-    <div class="form">
+    <div class="form1">
         <form action="{%url 'addSource'%}" method="POST">
             {% csrf_token %}
-            Add Income Sources :
+            <div> Add Income Sources : </div>
             <input type="text" placeholder="Source" name="Source">
-            <input type="submit" class="btn btn-primary">
+            <input type="submit" class="btn btn-primary m-2">
         </form>
         <div>
             {% for source in sources %}
