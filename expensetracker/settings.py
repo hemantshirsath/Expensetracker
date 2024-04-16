@@ -49,7 +49,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'api',
     'goals',
-    'userprofile'
+    'userprofile',
+    'report_generation'
 ]
 
 MIDDLEWARE = [
