@@ -11,7 +11,13 @@ from expenses.models import ExpenseLimit
 @login_required(login_url='/authentication/login')
 
 def index(request):
-    daily_expense_limit=ExpenseLimit.objects.filter(owner=request.user).first()
+    # daily_expense_limit=ExpenseLimit.objects.filter(owner=request.user).first()
+    daily_expense_limit, created = ExpenseLimit.objects.get_or_create(
+    owner=request.user,
+    defaults={
+        'daily_expense_limit': 5000 # Replace with a default value for the limit
+    }
+)
     currency_data = []
     exists = UserPreference.objects.filter(user=request.user).exists()
     user_preferences = None
